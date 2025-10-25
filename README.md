@@ -116,9 +116,9 @@ See Hello world function code in Hello.py
 
 ## Author:
     
-Name: S Yogesh
-Email: siddapati.yogesh26@gmail.com
-Mobile: 8688288971
+1. Name: S Yogesh
+2. Email: siddapati.yogesh26@gmail.com
+3. Mobile: 8688288971
 
 
      
