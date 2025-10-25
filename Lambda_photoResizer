@@ -2,47 +2,59 @@ import boto3
 from PIL import Image
 import io
 import os
+import time
+from urllib.parse import unquote_plus
 
 s3 = boto3.client('s3')
 
-# Target bucket name (edit to match yours)
-TARGET_BUCKET = "photo-resized-yogesh"
+# 🎯 Change this to your actual target bucket name
+TARGET_BUCKET = "target-source-26"
 
 def lambda_handler(event, context):
-    # Get bucket and object key from event
+    # ✅ Decode S3 event details safely
     source_bucket = event['Records'][0]['s3']['bucket']['name']
-    object_key = event['Records'][0]['s3']['object']['key']
+    object_key = unquote_plus(event['Records'][0]['s3']['object']['key'])
     print(f"Processing file: {object_key} from bucket: {source_bucket}")
 
     try:
-        # Download the image from source S3 bucket
-        response = s3.get_object(Bucket=source_bucket, Key=object_key)
-        image_content = response['Body'].read()
+        # 🕓 Optional retry in case file isn’t immediately available
+        for attempt in range(3):
+            try:
+                response = s3.get_object(Bucket=source_bucket, Key=object_key)
+                break
+            except s3.exceptions.NoSuchKey:
+                print(f"File not found yet, retrying... attempt {attempt+1}")
+                time.sleep(2)
+        else:
+            raise Exception("File not found after multiple retries")
 
-        # Open image with Pillow
+        # 🖼 Read image from S3
+        image_content = response['Body'].read()
         image = Image.open(io.BytesIO(image_content))
 
-        # Resize (keep aspect ratio, max width=300px)
+        # 🪄 Resize while preserving aspect ratio
         image.thumbnail((300, 300))
 
-        # Save resized image to bytes buffer
+        # 💾 Save resized image to memory buffer
         buffer = io.BytesIO()
-        image.save(buffer, format=image.format)
+        image_format = image.format if image.format else "PNG"
+        image.save(buffer, format=image_format)
         buffer.seek(0)
 
-        # Define target object key
+        # 📦 Create a new file name for the resized image
         file_name, file_ext = os.path.splitext(object_key)
         resized_key = f"{file_name}_resized{file_ext}"
 
-        # Upload to target bucket
+        # ☁️ Upload resized image to target bucket
         s3.put_object(
             Bucket=TARGET_BUCKET,
             Key=resized_key,
             Body=buffer,
-            ContentType=response['ContentType']
+            ContentType=response.get('ContentType', 'image/png')
         )
 
         print(f"✅ Resized image uploaded to {TARGET_BUCKET}/{resized_key}")
+
         return {
             'statusCode': 200,
             'body': f"Resized image saved as {resized_key}"
