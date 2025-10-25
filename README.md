@@ -68,6 +68,58 @@ See Hello world function code in Hello.py
 
 # -----------------
 
+## AWS Lambda (Photo Resizer)
+
+## Console steps — do these now
+  1. Open Lambda in AWS Console
+         In AWS Console, Services → Lambda.
+  2. Create function
+
+     Click Create function → Author from scratch.
+     Function name: photoresizer
+     Runtime: Python 3.13 
+     Architecture: leave default (x86_64) unless you want arm.
+      Permissions → Execution role:
+     Choose Create a new role from AWS policy templates.
+     Role name: PRR
+     Policy templates: select Create basic Lambda permissions (this attaches AWSLambdaBasicExecutionRole which allows CloudWatch logs).
+     Click Create function.
+  The console will create the function and open the function configuration page.
+
+<img width="1084" height="658" alt="image" src="https://github.com/user-attachments/assets/d3b664f2-9522-4f1d-8c22-b8d8f0602dde" />
+
+  3. Deploy python code
+  4. Add Trigger
+     choose: bucket-source-26
+
+     <img width="1424" height="698" alt="image" src="https://github.com/user-attachments/assets/e60477e1-eb27-40d2-93c6-d4e2e5ccdfc7" />
+
+  5. Add Python Library Pillow
+
+     <img width="1432" height="464" alt="image" src="https://github.com/user-attachments/assets/19bd5ebc-b954-4113-8f28-996b2c39ed0d" />
+
+  
+  6. Upload file in Bucket
+     
+     <img width="1433" height="447" alt="image" src="https://github.com/user-attachments/assets/89223c79-440d-40b3-badc-2e84523f8b70" />
+  
+  7. Verify in target bucket and Logs
+ 
+      1. In logs
+
+     <img width="1697" height="375" alt="image" src="https://github.com/user-attachments/assets/c0b93490-153d-43e4-bf92-7ca94586fa4a" />
+
+      2. Target bucket
+
+         <img width="1713" height="858" alt="image" src="https://github.com/user-attachments/assets/3b13e884-723a-4b5e-aff7-ee3126de38d3" />
+
+
+     
+
+
+     
+
+
 
 
 
